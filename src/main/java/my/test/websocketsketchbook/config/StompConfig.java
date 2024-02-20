@@ -14,7 +14,8 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stomp/chat");
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*");
 //                .withSockJS();
     }
 
@@ -22,7 +23,12 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setPathMatcher(new AntPathMatcher("."))
                 .setApplicationDestinationPrefixes("/pub")
-                .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
+                .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
+                .setRelayHost("localhost")
+                .setVirtualHost("/")
+                .setRelayPort(61613)
+                .setClientLogin("guest")
+                .setClientPasscode("guest");
 
 
     }

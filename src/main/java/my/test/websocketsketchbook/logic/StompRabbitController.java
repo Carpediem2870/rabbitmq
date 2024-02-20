@@ -33,6 +33,11 @@ public class StompRabbitController {
     private final org.springframework.amqp.core.Exchange exchange;
     private final Binding binding;
 
+    /*
+    *  FIXME -> routingKey 를 각 채팅방 별로 지정하고, 저장할 수 있게 컬럼을 추가해주자 그리고 targetIuser 가 제공되면,
+    *           로그인 유져와 target 유저가 속해있는 방의 저장되어있는 routingKey 를 가져와서 해당키를 queue 방식으로 구독시키자.
+    */
+    // TODO -> 현재는 routingKey 자체가 Queue 가 되고, 자기 자신으로 라우팅 한다.
     // TODO -> 1:1채팅은 무조건 큐 발급, 큐 구독으로 하자 (routingKey 는 쓰지않고, 큐만으로 구분을 하자.)
     // TODO -> 이제 큐구독을 어떻게 하는지를 알아보아야 한다.
     // TODO -> 리스너로는 테스트 성공한다.

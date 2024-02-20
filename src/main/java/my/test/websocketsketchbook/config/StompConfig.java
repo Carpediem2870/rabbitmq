@@ -22,7 +22,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setPathMatcher(new AntPathMatcher("."))
-                .setApplicationDestinationPrefixes("/pub")
+                .setApplicationDestinationPrefixes("/chat")
                 .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
                 .setRelayHost("localhost")
                 .setVirtualHost("/")

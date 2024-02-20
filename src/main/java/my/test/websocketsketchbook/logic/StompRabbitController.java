@@ -36,6 +36,17 @@ public class StompRabbitController {
     // TODO -> 1:1채팅은 무조건 큐 발급, 큐 구독으로 하자 (routingKey 는 쓰지않고, 큐만으로 구분을 하자.)
     // TODO -> 이제 큐구독을 어떻게 하는지를 알아보아야 한다.
     // TODO -> 리스너로는 테스트 성공한다.
+    /*
+        TODO -> 만약 프론트에서 구독을 수행한다면, ws://localhost:8080/ws 로 소켓 연결,
+                /chat/message.{targetIuser} 로 요청하면 해당 유저가 대상유저와 채팅하기위해 정해진 queue 이름으로 메시지를 보낼수 있다는것을
+                말해주어야 한다.
+                다만, 이사람이 메시지를 받는 @RabbitListener(queues = "xxx") 를 위해 내가 큐 이름을 리턴해주어야 한다면
+                사전에 @GetMapping 으로 targetIuser 정보를 보내면 해당 로그인유저와 target 유저의 채팅을 위한 구독 url 을 알려주어야 한다.
+                구독 url 에는 받는사람의 iuser 를 적자.
+                정확한 개념은 잘 모르겠다.
+
+
+    */
     @GetMapping("queue")
     public void createQueue() {
 //        template.convertAndSend(CHAT_EXCHANGE_NAME, "test", "testMessage");
@@ -50,7 +61,7 @@ public class StompRabbitController {
 
     /* ----------------------------------------------------------------------- */
 
-    @MessageMapping("chat.enter.{targetIuser}")
+    @MessageMapping("enter.{targetIuser}")
     public void enter(@Payload String message, @DestinationVariable Long targetIuser) {
         ChatDto chat = new ChatDto();
         chat.setMessage("입장");
@@ -62,7 +73,7 @@ public class StompRabbitController {
 
     }
 
-    @MessageMapping("chat.message.{targetIuser}")
+    @MessageMapping("message.{targetIuser}")
     public void send(@Payload String message, @DestinationVariable Long targetIuser) {
         ChatDto chat = new ChatDto();
         chat.setRegDate(LocalDateTime.now());

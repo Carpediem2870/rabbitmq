@@ -40,12 +40,9 @@ public class StompRabbitController {
         TODO -> 만약 프론트에서 구독을 수행한다면, ws://localhost:8080/ws 로 소켓 연결,
                 /chat/message.{targetIuser} 로 요청하면 해당 유저가 대상유저와 채팅하기위해 정해진 queue 이름으로 메시지를 보낼수 있다는것을
                 말해주어야 한다.
-                다만, 이사람이 메시지를 받는 @RabbitListener(queues = "xxx") 를 위해 내가 큐 이름을 리턴해주어야 한다면
-                사전에 @GetMapping 으로 targetIuser 정보를 보내면 해당 로그인유저와 target 유저의 채팅을 위한 구독 url 을 알려주어야 한다.
-                구독 url 에는 받는사람의 iuser 를 적자.
-                정확한 개념은 잘 모르겠다.
-
-
+                다만, 이사람이 메시지를 받는 @RabbitListener(queues = "xxx") 처럼 내가 큐 이름을 리턴해주어야 한다면
+                사전에 @GetMapping 으로 targetIuser 정보를 보내면 해당 로그인유저와 target 유저의 채팅을 위한 구독 큐 를 알려주도록 하자.
+                큐는 chat_user 테이블의 두 유저로 인해 생성된 pk 를 통해 만들자.
     */
     @GetMapping("queue")
     public void createQueue() {

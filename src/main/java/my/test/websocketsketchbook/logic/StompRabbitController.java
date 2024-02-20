@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -31,7 +32,7 @@ public class StompRabbitController {
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
     private final org.springframework.amqp.core.Exchange exchange;
-    private final Binding binding;
+//    private final Binding binding;
 
     /*
     *  FIXME -> routingKey 를 각 채팅방 별로 지정하고, 저장할 수 있게 컬럼을 추가해주자 그리고 targetIuser 가 제공되면,
@@ -55,9 +56,9 @@ public class StompRabbitController {
                 그 이후, 클라이언트는 /chat/message.{queue} 로 소켓요청 -> 이때 메시지를 포함해서 보내야 함 그 메시지가 전송됨
     */
     @GetMapping("queue")
-    public void createQueue() {
+    public void createQueue(@RequestParam(required = false) Integer routingKey) {
 //        template.convertAndSend(CHAT_EXCHANGE_NAME, "test", "testMessage");
-        template.convertAndSend("test", "testMessage");
+        template.convertAndSend("test" + (routingKey == null ? "" : routingKey), "testMessage");
     }
 
     @RabbitListener(queues = "test")
@@ -65,6 +66,31 @@ public class StompRabbitController {
         System.out.println("==================== receive3 :: use Queue =====================");
         log.info("message = {}", message);
     }
+//    @RabbitListener(queues = "test1")
+//    public void receive1(String message) {
+//        System.out.println("==================== receive3 :: use Queue =====================");
+//        log.info("message = {}", message);
+//    }
+//    @RabbitListener(queues = "test2")
+//    public void receive4(String message) {
+//        System.out.println("==================== receive3 :: use Queue =====================");
+//        log.info("message = {}", message);
+//    }
+//    @RabbitListener(queues = "test3")
+//    public void receive5(String message) {
+//        System.out.println("==================== receive3 :: use Queue =====================");
+//        log.info("message = {}", message);
+//    }
+//    @RabbitListener(queues = "test4")
+//    public void receive6(String message) {
+//        System.out.println("==================== receive3 :: use Queue =====================");
+//        log.info("message = {}", message);
+//    }
+//    @RabbitListener(queues = "test5")
+//    public void receive7(String message) {
+//        System.out.println("==================== receive3 :: use Queue =====================");
+//        log.info("message = {}", message);
+//    }
 
     /* ----------------------------------------------------------------------- */
 
@@ -112,11 +138,11 @@ public class StompRabbitController {
     }
 
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        System.out.println(binding.getDestination());
-        System.out.println(binding.getDestinationType());
-    }
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void init() {
+//        System.out.println(binding.getDestination());
+//        System.out.println(binding.getDestinationType());
+//    }
 
 
 //    // 큐기준으로는 문제 없이 받아진다.

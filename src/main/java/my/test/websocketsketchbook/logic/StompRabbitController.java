@@ -36,6 +36,7 @@ public class StompRabbitController {
     // TODO -> 1:1채팅은 무조건 큐 발급, 큐 구독으로 하자 (routingKey 는 쓰지않고, 큐만으로 구분을 하자.)
     // TODO -> 이제 큐구독을 어떻게 하는지를 알아보아야 한다.
     // TODO -> 리스너로는 테스트 성공한다.
+    //
     /*
         TODO -> 만약 프론트에서 구독을 수행한다면, ws://localhost:8080/ws 로 소켓 연결,
                 /chat/message.{targetIuser} 로 요청하면 해당 유저가 대상유저와 채팅하기위해 정해진 queue 이름으로 메시지를 보낼수 있다는것을
@@ -43,6 +44,10 @@ public class StompRabbitController {
                 다만, 이사람이 메시지를 받는 @RabbitListener(queues = "xxx") 처럼 내가 큐 이름을 리턴해주어야 한다면
                 사전에 @GetMapping 으로 targetIuser 정보를 보내면 해당 로그인유저와 target 유저의 채팅을 위한 구독 큐 를 알려주도록 하자.
                 큐는 chat_user 테이블의 두 유저로 인해 생성된 pk 를 통해 만들자.
+
+        TODO -> 실제로 구현시에는 @GetMapping 으로 queue 정보 제공 ->
+                @MessageMapping 에 경로(/chat/message.{queue} 에 요청, 구독 할 수 있도록) 를 알려줌
+                그 이후, 클라이언트는 /chat/message.{queue} 로 소켓요청 -> 이때 메시지를 포함해서 보내야 함 그 메시지가 전송됨
     */
     @GetMapping("queue")
     public void createQueue() {

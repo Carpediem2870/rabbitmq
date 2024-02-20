@@ -1,0 +1,24 @@
+
+spring:
+  datasource:
+    password: sa
+    url: jdbc:h2:tcp://localhost/~/test
+    driver-class-name: org.h2.Driver
+    username: sa
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: on
+    properties:
+      hibernate:
+        format_sql: true
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+logging:
+  level:
+    org.hibernate.sql: trace
+    org.hibernate.orm.jdbc.bind: trace # ???? ???? ?? ??

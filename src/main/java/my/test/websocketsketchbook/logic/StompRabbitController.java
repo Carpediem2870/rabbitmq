@@ -31,7 +31,7 @@ public class StompRabbitController {
     private final RabbitTemplate template;
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-    private final org.springframework.amqp.core.Exchange exchange;
+//    private final org.springframework.amqp.core.Exchange exchange;
 //    private final Binding binding;
 
     /*
@@ -56,12 +56,12 @@ public class StompRabbitController {
                 그 이후, 클라이언트는 /chat/message.{queue} 로 소켓요청 -> 이때 메시지를 포함해서 보내야 함 그 메시지가 전송됨
     */
     @GetMapping("queue")
-    public void createQueue(@RequestParam(required = false) Integer routingKey) {
-//        template.convertAndSend(CHAT_EXCHANGE_NAME, "test", "testMessage");
+    public void createQueue(@RequestParam(required = false) String routingKey) {
+//        template.convertAndSend(CHAT_EXCHANGE_NAME, "room." + routingKey, "testMessage");
         template.convertAndSend("test" + (routingKey == null ? "" : routingKey), "testMessage");
     }
 
-    @RabbitListener(queues = "test")
+//    @RabbitListener(queues = "test")
     public void receive3(String message) {
         System.out.println("==================== receive3 :: use Queue =====================");
         log.info("message = {}", message);
@@ -132,10 +132,37 @@ public class StompRabbitController {
             value = @Queue(name = CHAT_QUEUE_NAME),
             key = "room.*"
     ))
-    public void receive2(String message) {
-        System.out.println("=========================================");
+
+
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = CHAT_EXCHANGE_NAME),
+            value = @Queue(name = CHAT_QUEUE_NAME),
+            key = "room.1"
+    ))
+    public void receive1(String message) {
+        System.out.println("====================1=====================");
         log.info("message = {}", message);
     }
+
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = CHAT_EXCHANGE_NAME),
+            value = @Queue(name = CHAT_QUEUE_NAME),
+            key = "room.2"
+    ))
+    public void receive2(String message) {
+        System.out.println("=====================2====================");
+        log.info("message = {}", message);
+    }
+    @RabbitListener(bindings = @QueueBinding(
+            exchange = @Exchange(name = CHAT_EXCHANGE_NAME),
+            value = @Queue(name = CHAT_QUEUE_NAME),
+            key = "room.3"
+    ))
+    public void receive33(String message) {
+        System.out.println("====================3=====================");
+        log.info("message = {}", message);
+    }
+
 
 
 //    @EventListener(ApplicationReadyEvent.class)

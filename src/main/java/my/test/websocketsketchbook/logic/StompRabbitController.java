@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -28,11 +29,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class StompRabbitController {
 
-    private final RabbitTemplate template;
+    private final RabbitTemplate template; // RabbitConfig에서 등록된것들 DI
     private static final String CHAT_QUEUE_NAME = "chat.queue";
-    private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
+    private static final String CHAT_EXCHANGE_NAME = "chat.exchange"; // queue를 찾아서 도착지를 바꿈
 //    private final org.springframework.amqp.core.Exchange exchange;
 //    private final Binding binding;
+    @Autowired
+    NewDtoRepository
 
     /*
     *  FIXME -> routingKey 를 각 채팅방 별로 지정하고, 저장할 수 있게 컬럼을 추가해주자 그리고 targetIuser 가 제공되면,
@@ -55,13 +58,15 @@ public class StompRabbitController {
                 @MessageMapping 에 경로(/chat/message.{queue} 에 요청, 구독 할 수 있도록) 를 알려줌
                 그 이후, 클라이언트는 /chat/message.{queue} 로 소켓요청 -> 이때 메시지를 포함해서 보내야 함 그 메시지가 전송됨
     */
+
+    //RabbitMq 큐를 생성하고 테스트메세지를 보내는 메소드
     @GetMapping("queue")
     public void createQueue(@RequestParam(required = false) String routingKey) {
 //        template.convertAndSend(CHAT_EXCHANGE_NAME, "room." + routingKey, "testMessage");
         template.convertAndSend("test" + (routingKey == null ? "" : routingKey), "testMessage");
     }
 
-//    @RabbitListener(queues = "test")
+    @RabbitListener(queues = "test")
     public void receive3(String message) {
         System.out.println("==================== receive3 :: use Queue =====================");
         log.info("message = {}", message);
@@ -94,7 +99,7 @@ public class StompRabbitController {
 
     /* ----------------------------------------------------------------------- */
 
-    @MessageMapping("enter.{targetIuser}")
+    /*@MessageMapping("enter.{targetIuser}")
     public void enter(@Payload String message, @DestinationVariable Long targetIuser) {
         ChatDto chat = new ChatDto();
         chat.setMessage("입장");
@@ -103,17 +108,24 @@ public class StompRabbitController {
         template.convertAndSend(CHAT_EXCHANGE_NAME, String.valueOf(targetIuser), chat); // use exchange
 //        template.convertAndSend("room." + targetIuser, chat); // use queue
 //        template.convertAndSend("amq.topic", "room." + targetIuser, chat); // topic
-
-    }
+    }*/
 
     @MessageMapping("message.{targetIuser}")
     public void send(@Payload String message, @DestinationVariable Long targetIuser) {
-        ChatDto chat = new ChatDto();
-        chat.setRegDate(LocalDateTime.now());
-        chat.setId(1L);
-        template.convertAndSend(CHAT_EXCHANGE_NAME, String.valueOf(targetIuser), chat); // use exchange
+
+        template.convertAndSend(CHAT_EXCHANGE_NAME, "room." + targetIuser, message); // chat 은 chat PK
         //        template.convertAndSend("room." + targetIuser, chat); // use queue
 //        template.convertAndSend("amq.topic", "room." + targetIuser, chat); // topic
+
+
+        //여기에서 DB에 저장하도록 설계하면됨
+    }
+
+    @MessageMapping("chat.room.send.{ireceiver}")
+    public void send2(@Payload String message, @DestinationVariable Long ireceiver) {
+        int ichat = 1;
+        template.convertAndSend(CHAT_EXCHANGE_NAME, "chat.room." + ichat, message);
+        // insert into t_chat (xx, x, x, msg) (y, yy, y, #{message})
     }
 
     // receive 는 단순히 메시지를 소비 (출력) 한다. - 디버그 용
